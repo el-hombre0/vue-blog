@@ -1,26 +1,59 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="app">
+    <!-- Подписка на событие create, указание, какая функция должна по нему срабатывать-->
+    <post-form @create="createPost"></post-form>
+    <!-- Передача постов, как пропсов, дочернему компоненту
+    Короткая запись :posts="posts" -->
+    <PostList v-bind:posts="posts"></PostList>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import PostForm from "@/components/PostForm";
+import PostList from "@/components/PostList";
 
 export default {
-  name: 'App',
   components: {
-    HelloWorld
-  }
-}
+    PostForm,
+    PostList,
+  },
+  data() {
+    return {
+      posts: [
+        {
+          id: 1,
+          title: "Javascript",
+          body: "JavaScript - это мультипарадигменный язык программирования.",
+        },
+        {
+          id: 2,
+          title: "React",
+          body: "React - JavaScript-библиотека, использующая модель компонентов",
+        },
+        {
+          id: 3,
+          title: "Vue.js",
+          body: "Vue.js - JavaScript-фреймворк.",
+        },
+      ],
+    };
+  },
+  methods: {
+    createPost(post) {
+      this.posts.push(post);
+    },
+  },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.app {
+  padding: 20px;
 }
 </style>
