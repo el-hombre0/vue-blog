@@ -4,7 +4,9 @@
   </button>
 </template>
 <script>
-export default {};
+export default {
+    name: 'my-button', // Имя компонента для глобальной регистрации
+};
 </script>
 <style scoped>
 .btn {
