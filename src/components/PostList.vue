@@ -1,21 +1,17 @@
 <template>
   <div>
-    <!--Итерирование по списку posts-->
-    <div class="post" v-for="post in posts" :key="post.id">
-      <div>
-        <h3>Название:</h3>
-        {{ post.title }}
-      </div>
-      <div>
-        <h4>Описание:</h4>
-        {{ post.body }}
-      </div>
-    </div>
+    <h2>Список пользователей</h2>
+    <post-item v-for="post in posts" v-bind:key="post.id"
+    v-bind:post="post"/>
   </div>
 </template>
 
 <script>
+import PostItem from '@/components/PostItem'
 export default {
+  components: {
+    PostItem
+  },
   // Получение постов через пропсы от родительского компонента
   props: {
     posts: {
