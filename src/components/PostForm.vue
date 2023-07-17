@@ -1,5 +1,6 @@
 <template>
   <div>
+    <h2>Создать пост</h2>
     <form @submit.prevent>
       <input
         v-model="post.title"
@@ -16,31 +17,39 @@
       <!-- Вместо v-model:
     v-bind:value="post.title" 
     @input="post.title = $event.target.value"-->
-      <button class="btn"
-      @click="createPost">Создать</button>
+      <my-button
+        @click="createPost"
+        style="align-self: flex-end; margin-top: 15px"
+        >Создать</my-button
+      >
     </form>
   </div>
 </template>
 
 <script>
+import MyButton from "@/components/UI/MyButton";
 
 export default {
+  components: {
+    MyButton,
+  },
   data() {
     return {
       post: { body: "", title: "" }, // Модель пост (изначально поля пустые)
     };
   },
   methods: {
-    createPost(){
+    createPost() {
       this.post.id = Date.now();
-      this.$emit('create', this.post) // Создание события для подписки на него родительского компонента
+      this.$emit("create", this.post); // Создание события для подписки на него родительского компонента
       // (название генерируемого события; аргументы, попадаемые в функцию)
-      this.post = { // После генерации очищаем пост для пустых инпутов
-        title: '',
-        body: '',
+      this.post = {
+        // После генерации очищаем пост для пустых инпутов
+        title: "",
+        body: "",
       };
-    }
-  }
+    },
+  },
 };
 </script>
 
