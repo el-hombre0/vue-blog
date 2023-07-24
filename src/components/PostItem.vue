@@ -11,7 +11,7 @@
       </div>
     </div>
     <div class="post__btns">
-      <my-button>Удалить</my-button>
+      <my-button @click="$emit('delete', post)">Удалить</my-button> <!--Отдаем пост наверх-->
     </div>
   </div>
 </template>
@@ -24,6 +24,11 @@ export default {
       required: true,
     },
   },
+  methods: {
+    deleteItem(){
+      
+    }
+  }
 };
 </script>
 

@@ -2,15 +2,16 @@
   <div>
     <h2>Создать пост</h2>
     <form @submit.prevent>
-      <input
+      <!--v-model="post.title" без конкретного указания value, применияется modelValue-->
+      <!-- v-model:value="post.title" с конкретным указанием-->
+
+      <my-input
         v-model="post.title"
-        class="input"
         type="text"
         placeholder="Название..."
       />
-      <input
+      <my-input
         v-model="post.body"
-        class="input"
         type="text"
         placeholder="Описание..."
       />
