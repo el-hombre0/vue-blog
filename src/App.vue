@@ -1,6 +1,9 @@
 <template>
   <div class="app">
     <h1>Страница с постами</h1>
+    <my-input 
+    v-model="searchQuery" 
+    placeholder="Найти..."/>
     <div class="app__btns">
       <!-- <input type="text" v-model.number="modificatorValue" /> -->
       <my-button @click="showModalbox">Создать пост</my-button>
@@ -15,7 +18,7 @@
     <!-- Передача постов, как пропсов, дочернему компоненту
     Короткая запись :posts="posts" -->
     <PostList
-      v-bind:posts="sortedPosts"
+      v-bind:posts="sortedAndSearchedPosts"
       @delete="deletePost"
       v-if="!isPostsLoading"
     ></PostList>
@@ -55,7 +58,7 @@ export default {
       ],
       modalboxVisable: false,
       isPostsLoading: false,
-      selectedSort: "", // По умолчанию стоит ничего не выбрано в выпадающем списке
+      selectedSort: '', // По умолчанию стоит ничего не выбрано в выпадающем списке
       sortOptions: [
         // Массив, содержащий элементы списка для сортировки
         {
@@ -71,6 +74,7 @@ export default {
           name: "По id"
         }
       ],
+      searchQuery: '', // Поисковой запрос
     };
   },
   methods: {
@@ -113,6 +117,10 @@ export default {
         // Функция sort() мутирует исходный массив
         return post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]) // newValue = this.selectedSort
       }); // Возвращает другой отсортированный массив, в который развернут исходный
+    },
+    sortedAndSearchedPosts() // Реализация поиска поста по названию
+    {
+      return this.sortedPosts.filter(post => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
     }
   },
   // watch: { // Объект, реализующий функцию-наблюдатель
