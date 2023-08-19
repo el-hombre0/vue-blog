@@ -1,10 +1,11 @@
 <template>
   <div class="app">
     <h1>Страница с постами</h1>
-    <!-- <input type="text" v-model.number="modificatorValue" /> -->
-    <my-button style="margin: 15px 0" @click="showModalbox"
-      >Создать пост</my-button
-    >
+    <div class="app__btns">
+      <!-- <input type="text" v-model.number="modificatorValue" /> -->
+      <my-button @click="showModalbox">Создать пост</my-button>
+      <sort-select v-model="selectedSort" :options="sortOptions"></sort-select>
+    </div>
     <modal-box v-model:show="modalboxVisable">
       <!-- Подписка на событие create, указание, какая функция должна по нему срабатывать-->
       <PostForm @create="createPost"></PostForm>
@@ -53,8 +54,23 @@ export default {
         // },
       ],
       modalboxVisable: false,
-      modificatorValue: "",
       isPostsLoading: false,
+      selectedSort: "", // По умолчанию стоит ничего не выбрано в выпадающем списке
+      sortOptions: [
+        // Массив, содержащий элементы списка для сортировки
+        {
+          value: "title",
+          name: "По названию", // сортировка по названию
+        },
+        {
+          value: "body",
+          name: "По описанию",
+        },
+        {
+          value: "id",
+          name: "По id"
+        }
+      ],
     };
   },
   methods: {
@@ -103,5 +119,11 @@ export default {
 
 .app {
   padding: 20px;
+}
+
+.app__btns {
+  display: flex;
+  justify-content: space-between;
+  margin: 15px 0;
 }
 </style>
