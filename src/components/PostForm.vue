@@ -48,6 +48,14 @@ export default {
       };
     },
   },
+  watch: {
+    post: {
+      handler(newValue) { // Функция-наблюдатель
+        console.log(newValue) // Каждое изменение формы создания поста выводится в консоль
+      },
+      deep: true, // Глубокое отслеживание объекта
+    }
+  }
 };
 </script>
 

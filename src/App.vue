@@ -15,7 +15,7 @@
     <!-- Передача постов, как пропсов, дочернему компоненту
     Короткая запись :posts="posts" -->
     <PostList
-      v-bind:posts="posts"
+      v-bind:posts="sortedPosts"
       @delete="deletePost"
       v-if="!isPostsLoading"
     ></PostList>
@@ -107,6 +107,22 @@ export default {
     // Хук для отправки запроса на этапе монтирования компонента
     this.fetchPosts();
   },
+  computed: { // вычисляемое свойство. То же самое, что и watch, только возвращает новый массив
+    sortedPosts(){
+      return [...this.posts].sort((post1, post2) => { // Сравнение названия и описания одного поста с другим
+        // Функция sort() мутирует исходный массив
+        return post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]) // newValue = this.selectedSort
+      }); // Возвращает другой отсортированный массив, в который развернут исходный
+    }
+  },
+  // watch: { // Объект, реализующий функцию-наблюдатель
+  //   selectedSort(newValue){ // Сортировка
+  //     this.posts.sort((post1, post2) => { // Сравнение названия и описания одного поста с другим
+  //       // Функция sort() мутирует исходный массив
+  //       return post1[newValue]?.localeCompare(post2[newValue]) // newValue = this.selectedSort
+  //     })
+  //   },
+  // }
 };
 </script>
 
