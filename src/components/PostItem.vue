@@ -2,6 +2,8 @@
   <div class="post">
     <div>
       <div>
+        <i>№{{ post.id }}</i>
+        
         <h3>Название:</h3>
         {{ post.title }}
       </div>

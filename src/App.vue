@@ -1,9 +1,7 @@
 <template>
   <div class="app">
     <h1>Страница с постами</h1>
-    <my-input 
-    v-model="searchQuery" 
-    placeholder="Найти..."/>
+    <my-input v-model="searchQuery" placeholder="Найти..." />
     <div class="app__btns">
       <!-- <input type="text" v-model.number="modificatorValue" /> -->
       <my-button @click="showModalbox">Создать пост</my-button>
@@ -24,6 +22,20 @@
     ></PostList>
     <div v-else>
       <h3>Загрузка...</h3>
+    </div>
+
+    <div class="page__wrapper">
+      <div
+        class="page"
+        v-for="pageNum in totalPages"
+        :key="pageNum"
+        v-bind:class="{
+          'current-page': page === pageNum,
+        }"
+        @click="changePage(pageNum)"
+      >
+        {{ pageNum }}
+      </div>
     </div>
   </div>
 </template>
@@ -58,7 +70,7 @@ export default {
       ],
       modalboxVisable: false,
       isPostsLoading: false,
-      selectedSort: '', // По умолчанию стоит ничего не выбрано в выпадающем списке
+      selectedSort: "", // По умолчанию стоит ничего не выбрано в выпадающем списке
       sortOptions: [
         // Массив, содержащий элементы списка для сортировки
         {
@@ -71,10 +83,14 @@ export default {
         },
         {
           value: "id",
-          name: "По id"
-        }
+          name: "По id",
+        },
       ],
-      searchQuery: '', // Поисковой запрос
+      searchQuery: "", // Поисковой запрос
+      // Для пагинации
+      page: 1, // Номер страницы
+      limit: 10, // Количество постов на странице
+      totalPages: 0, // Всего страниц
     };
   },
   methods: {
@@ -97,8 +113,18 @@ export default {
         setTimeout(async () => {
           // Для создание видимой задержки загрузки постов
           const response = await axios(
-            "https://jsonplaceholder.typicode.com/posts?_limit=10"
+            "https://jsonplaceholder.typicode.com/posts",
+            {
+              params: {
+                _page: this.page,
+                _limit: this.limit,
+              },
+            }
           );
+          this.totalPages = Math.ceil(
+            response.headers["x-total-count"] / this.limit
+          ); // Общее кол-во постов делим на кол-во постов на одной странице(округление вверх)
+          console.log(this.totalPages);
           this.posts = response.data;
           this.isPostsLoading = false;
         }, 1000);
@@ -106,31 +132,44 @@ export default {
         alert("Ошибка получения данных!");
       }
     },
+    changePage(pageNum){
+      this.page = pageNum;
+    }
   },
   mounted() {
     // Хук для отправки запроса на этапе монтирования компонента
     this.fetchPosts();
   },
-  computed: { // вычисляемое свойство. То же самое, что и watch, только возвращает новый массив
-    sortedPosts(){
-      return [...this.posts].sort((post1, post2) => { // Сравнение названия и описания одного поста с другим
+  computed: {
+    // вычисляемое свойство. То же самое, что и watch, только возвращает новый массив
+    sortedPosts() {
+      return [...this.posts].sort((post1, post2) => {
+        // Сравнение названия и описания одного поста с другим
         // Функция sort() мутирует исходный массив
-        return post1[this.selectedSort]?.localeCompare(post2[this.selectedSort]) // newValue = this.selectedSort
+        return post1[this.selectedSort]?.localeCompare(
+          post2[this.selectedSort]
+        ); // newValue = this.selectedSort
       }); // Возвращает другой отсортированный массив, в который развернут исходный
     },
-    sortedAndSearchedPosts() // Реализация поиска поста по названию
-    {
-      return this.sortedPosts.filter(post => post.title.toLowerCase().includes(this.searchQuery.toLowerCase()))
-    }
+    sortedAndSearchedPosts() {
+      // Реализация поиска поста по названию
+      return this.sortedPosts.filter((post) =>
+        post.title.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
   },
-  // watch: { // Объект, реализующий функцию-наблюдатель
+  watch: { 
+    // Объект, реализующий функцию-наблюдатель
   //   selectedSort(newValue){ // Сортировка
   //     this.posts.sort((post1, post2) => { // Сравнение названия и описания одного поста с другим
   //       // Функция sort() мутирует исходный массив
   //       return post1[newValue]?.localeCompare(post2[newValue]) // newValue = this.selectedSort
   //     })
   //   },
-  // }
+  page() {
+    this.fetchPosts();
+  }
+  }
 };
 </script>
 
@@ -149,5 +188,18 @@ export default {
   display: flex;
   justify-content: space-between;
   margin: 15px 0;
+}
+
+.page__wrapper {
+  display: flex;
+  margin-top: 15px;
+}
+.page {
+  border: 1px solid gray;
+  padding: 5px;
+}
+.current-page {
+  padding: 7px;
+  background-color: rgb(218, 218, 218);
 }
 </style>
