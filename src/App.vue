@@ -23,8 +23,8 @@
     <div v-else>
       <h3>Загрузка...</h3>
     </div>
-
-    <div class="page__wrapper">
+    <div ref="observer" class="observer"></div>
+    <!-- <div class="page__wrapper">
       <div
         class="page"
         v-for="pageNum in totalPages"
@@ -36,7 +36,7 @@
       >
         {{ pageNum }}
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -88,7 +88,7 @@ export default {
       ],
       searchQuery: "", // Поисковой запрос
       // Для пагинации
-      page: 1, // Номер страницы
+      page: 0, // Номер страницы
       limit: 10, // Количество постов на странице
       totalPages: 0, // Всего страниц
     };
@@ -121,10 +121,10 @@ export default {
               },
             }
           );
+          // Общее кол-во постов делим на кол-во постов на одной странице(округление вверх)
           this.totalPages = Math.ceil(
             response.headers["x-total-count"] / this.limit
-          ); // Общее кол-во постов делим на кол-во постов на одной странице(округление вверх)
-          console.log(this.totalPages);
+          );
           this.posts = response.data;
           this.isPostsLoading = false;
         }, 1000);
@@ -132,13 +132,56 @@ export default {
         alert("Ошибка получения данных!");
       }
     },
-    changePage(pageNum){
-      this.page = pageNum;
-    }
+
+    // Функция бесконечного скролла
+    async loadMorePosts() {
+      // this.isPostsLoading = true;
+      // Получение постов
+      try {
+        this.page += 1;
+          // Для создание видимой задержки загрузки постов
+          const response = await axios.get(
+            "https://jsonplaceholder.typicode.com/posts",
+            {
+              params: {
+                _page: this.page,
+                _limit: this.limit,
+              },
+            }
+          );
+          this.totalPages = Math.ceil(
+            response.headers["x-total-count"] / this.limit
+          ); // Общее кол-во постов делим на кол-во постов на одной странице(округление вверх)
+          this.posts = [...this.posts, ...response.data]; // Добавляем в старый массив новые посты
+        } catch (e) {
+        alert("Ошибка получения данных!");
+      }
+    },
+    // changePage(pageNum) {
+    //   this.page = pageNum;
+    // },
   },
   mounted() {
     // Хук для отправки запроса на этапе монтирования компонента
     this.fetchPosts();
+
+
+    // Отслеживание области vieport, когда пользователь до нее опустится
+    const options = {
+      rootMargin: "0px",
+      threshold: 1.0,
+    };
+
+     const callback = (entries, observer) => {
+      if(entries[0].isIntersecting && this.page < this.totalPages){
+        this.loadMorePosts()
+      }
+    };
+
+    const observer = new IntersectionObserver(callback, options);
+  
+    // Получение DOM-элемента из компонента
+    observer.observe(this.$refs.observer)
   },
   computed: {
     // вычисляемое свойство. То же самое, что и watch, только возвращает новый массив
@@ -158,18 +201,18 @@ export default {
       );
     },
   },
-  watch: { 
+  watch: {
     // Объект, реализующий функцию-наблюдатель
-  //   selectedSort(newValue){ // Сортировка
-  //     this.posts.sort((post1, post2) => { // Сравнение названия и описания одного поста с другим
-  //       // Функция sort() мутирует исходный массив
-  //       return post1[newValue]?.localeCompare(post2[newValue]) // newValue = this.selectedSort
-  //     })
-  //   },
-  page() {
-    this.fetchPosts();
-  }
-  }
+    //   selectedSort(newValue){ // Сортировка
+    //     this.posts.sort((post1, post2) => { // Сравнение названия и описания одного поста с другим
+    //       // Функция sort() мутирует исходный массив
+    //       return post1[newValue]?.localeCompare(post2[newValue]) // newValue = this.selectedSort
+    //     })
+    //   },
+    // page() {
+    //   this.fetchPosts();
+    // },
+  },
 };
 </script>
 
@@ -201,5 +244,9 @@ export default {
 .current-page {
   padding: 7px;
   background-color: rgb(218, 218, 218);
+}
+
+.observer {
+  height: 30px;
 }
 </style>
