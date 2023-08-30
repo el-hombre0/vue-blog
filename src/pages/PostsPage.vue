@@ -18,13 +18,12 @@
       <PostList
         v-bind:posts="sortedAndSearchedPosts"
         @delete="deletePost"
-        @open="openPost"
         v-if="!isPostsLoading"
       ></PostList>
       <div v-else>
         <h3>Загрузка...</h3>
       </div>
-      <div ref="observer" class="observer"></div>
+      <div v-intersection="loadMorePosts" class="observer"></div>
       <!-- <div class="page__wrapper">
         <div
           class="page"
@@ -89,7 +88,7 @@
         ],
         searchQuery: "", // Поисковой запрос
         // Для пагинации
-        page: 1, // Номер страницы
+        page: 0, // Номер страницы
         limit: 10, // Количество постов на странице
         totalPages: 0, // Всего страниц
       };
@@ -103,9 +102,6 @@
         // Проходимся по постам, тк функция возвращает новый массив, перезаписываем старый.
         // В результирующий массив попадают только те посты, id которых не равен посту, который мы пытаемся удалить
         this.posts = this.posts.filter((p) => p.id !== post.id);
-      },
-      openPost(post){
-        console.log('Подробнее о посте ', post.id);
       },
       showModalbox() {
         this.modalboxVisable = true;
@@ -170,22 +166,7 @@
       this.fetchPosts();
   
   
-      // Отслеживание области vieport, когда пользователь до нее опустится
-      const options = {
-        rootMargin: "0px",
-        threshold: 1.0,
-      };
-  
-       const callback = (entries, observer) => {
-        if(entries[0].isIntersecting && this.page < this.totalPages){
-          this.loadMorePosts()
-        }
-      };
-  
-      const observer = new IntersectionObserver(callback, options);
-    
-      // Получение DOM-элемента из компонента
-      observer.observe(this.$refs.observer)
+      
     },
     computed: {
       // вычисляемое свойство. То же самое, что и watch, только возвращает новый массив
