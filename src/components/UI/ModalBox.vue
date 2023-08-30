@@ -1,24 +1,32 @@
 <template>
-  <div class="modalbox" v-if="show" @click.stop="hideModalbox"><!--click.stop для отмены всплытия события в js, для возможность ввода в контентную часть и закрытия окна при нажатии вне его -->
+  <div class="modalbox" v-if="show" @click.stop="hideModalbox">
+    <!--click.stop для отмены всплытия события в js, 
+      для возможность ввода в контентную часть и закрытия окна при нажатии вне его -->
     <div class="modalbox__content" @click.stop>
       <slot></slot>
     </div>
   </div>
 </template>
 <script>
+import toggleMixin from '@/mixins/toggleMixin'
 export default {
   name: "modal-box",
-  props: {
-    show: {
-      type: Boolean,
-      default: true,
-    },
-  },
-  methods: {
-    hideModalbox() {
-      this.$emit("update:show", false);
-    },
-  },
+  mixins: [toggleMixin],
+  mounted(){
+    console.log('component mounted')
+  }
+  // Что ниже, то ушло в mixin
+  // props: {
+  //   show: {
+  //     type: Boolean,
+  //     default: true,
+  //   },
+  // },
+  // methods: {
+  //   hideModalbox() {
+  //     this.$emit("update:show", false);
+  //   },
+  // },
 };
 </script>
 <style>
